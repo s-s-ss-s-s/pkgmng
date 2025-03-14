@@ -142,13 +142,39 @@ def main(zip_path):
 
     # Если передан ZIP, распаковываем его
     if os.path.exists(zip_path):
+        # Удаляем ранее извлеченные файлы, если они существуют
         shutil.rmtree(extracted_path, ignore_errors=True)
+
+        # Создаем новую директорию для извлеченных файлов
         os.makedirs(extracted_path)
+
+        # Открываем архив и извлекаем его содержимое
         with zipfile.ZipFile(zip_path, "r") as zip_ref:
             zip_ref.extractall(extracted_path)
+
         print(f"✅ Архив {zip_path} распакован в {extracted_path}")
 
-    manifest_path = os.path.join(extracted_path, "test-package/manifest.hcl")
+        # Перенос всех файлов из подкаталогов в основную директорию
+        for root, dirs, files in os.walk(extracted_path):
+            for file in files:
+                # Полный путь к файлу
+                source_file = os.path.join(root, file)
+                destination_file = os.path.join(extracted_path, file)
+
+                # Избегаем перезаписи файлов
+                if os.path.exists(destination_file):
+                    print(f"❌ Файл {destination_file} уже существует. Пропускаем.")
+                    continue
+
+                # Перемещаем файл
+                shutil.move(source_file, destination_file)
+
+        # Удаляем пустые директории после перемещения
+        for root, dirs, files in os.walk(extracted_path, topdown=False):
+            for dir in dirs:
+                os.rmdir(os.path.join(root, dir))
+
+    manifest_path = os.path.join(extracted_path, "manifest.hcl")
 
 
     if not os.path.exists(manifest_path):
