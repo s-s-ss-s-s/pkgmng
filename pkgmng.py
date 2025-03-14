@@ -6,6 +6,7 @@ import hashlib
 import requests
 import datetime
 import subprocess
+import hisscl
 
 
 # --- Функция вычисления SHA256 ---
@@ -20,7 +21,7 @@ def compute_sha256(file_path):
 # --- Функция загрузки HCL-манифеста ---
 def load_manifest(manifest_path):
     with open(manifest_path, "r") as f:
-        return hcl2.load(f)
+        return hisscl.load_file(f)
 
 
 # --- Функция скачивания файла ---
