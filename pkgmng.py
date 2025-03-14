@@ -6,7 +6,7 @@ import hashlib
 import requests
 import datetime
 import subprocess
-import hisscl
+
 
 
 # --- Функция вычисления SHA256 ---
