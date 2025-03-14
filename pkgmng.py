@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 import zipfile
@@ -21,7 +22,13 @@ def compute_sha256(file_path):
 # --- Функция загрузки HCL-манифеста ---
 def load_manifest(manifest_path):
     with open(manifest_path, "r") as f:
-        return hcl.load(f)
+        parsed_data = hcl.load(f)
+
+        # Convert to JSON string (optional) or directly return as dictionary
+        json_data = json.dumps(parsed_data, indent=2)
+
+        return parsed_data  # or return json_data if you want a JSON string
+       # return hcl.load(f)
 
 
 # --- Функция скачивания файла ---
