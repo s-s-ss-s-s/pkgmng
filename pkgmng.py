@@ -1,7 +1,7 @@
 import os
 import shutil
 import zipfile
-import hcl2
+import hcl
 import hashlib
 import requests
 import datetime
@@ -21,7 +21,7 @@ def compute_sha256(file_path):
 # --- Функция загрузки HCL-манифеста ---
 def load_manifest(manifest_path):
     with open(manifest_path, "r") as f:
-        return hisscl.load_file(f)
+        return hcl.load(f)
 
 
 # --- Функция скачивания файла ---
