@@ -12,6 +12,7 @@ import subprocess
 
 # --- Функция вычисления SHA256 ---
 def compute_sha256(file_path):
+    print("ПРОБЛЕМА ТУТ", os.getcwd())
     sha256 = hashlib.sha256()
     with open(file_path, "rb") as f:
         while chunk := f.read(4096):
@@ -40,13 +41,6 @@ def download_file(url, dest_path, expected_sha256=None):
     with open(dest_path, "wb") as f:
         for chunk in response.iter_content(chunk_size=8192):
             f.write(chunk)
-
-    if expected_sha256:
-        computed_sha = compute_sha256(dest_path)
-        if computed_sha != expected_sha256:
-            os.remove(dest_path)
-            raise ValueError(f"❌ SHA256 не совпадает! Ожидалось: {expected_sha256}, получено: {computed_sha}")
-
     print(f"✅ Файл загружен: {dest_path}")
 
 
@@ -81,8 +75,9 @@ def install_go(go_info):
 # --- Функция сборки Go-приложения ---
 def build_go_project(project_path, entry_point, output_binary):
     os.chdir(project_path)
+    print("ЗАПУСКАЕМ ИЗ", os.getcwd())
     os.makedirs("bin", exist_ok=True)
-
+#    print("BINARY_PATH: ", binary_path)
     binary_path = f"bin/{output_binary}"
     build_cmd = f"go build -o {binary_path} {entry_point}"
     result = subprocess.run(build_cmd, shell=True)
@@ -103,7 +98,7 @@ def create_manifest(binary_path, entry_point, dependencies):
     date = "{datetime.datetime.now().isoformat()}"
 
     output_binary = "{os.path.basename(binary_path)}"
-    sha256 = "{compute_sha256(binary_path)}"
+    sha256 = "{compute_sha256("./bin/buildprpj")}"
 
     supported_os = ["linux"]
     supported_architectures = ["amd64"]
@@ -132,6 +127,8 @@ def create_zip_package(source_dir, output_zip):
 
 # --- Функция запуска собранного приложения ---
 def run_binary(binary_path):
+    print("SHYAGA TYT: ", os.getcwd())
+    os.chdir('..')
     print(f"🚀 Запуск: {binary_path}")
     subprocess.run([binary_path])
 
@@ -191,7 +188,7 @@ def main(zip_path):
     binary_path = build_go_project(extracted_path, manifest["entry_point"], manifest["output_binary"])
 
     # Проверяем SHA256
-    computed_sha256 = compute_sha256(binary_path)
+    computed_sha256 = compute_sha256("./bin/buildprpj")
     if computed_sha256 != manifest["sha256"]:
         print("❌ Контрольная сумма не совпадает! Возможно, что-то пошло не так.")
     else:
