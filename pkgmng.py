@@ -17,6 +17,19 @@ def compute_sha256(file_path):
     return sha256.hexdigest()
 
 
+# --- Функция распаковки ZIP-архива ---
+def extract_package(zip_path, extract_to="./extracted"):
+    if os.path.exists(extract_to):
+        shutil.rmtree(extract_to)
+    os.makedirs(extract_to)
+
+    with zipfile.ZipFile(zip_path, "r") as zip_ref:
+        zip_ref.extractall(extract_to)
+
+    print(f"✅ Архив {zip_path} распакован в {extract_to}")
+    return extract_to
+
+
 # --- Функция загрузки HCL-манифеста ---
 def load_manifest(manifest_path):
     with open(manifest_path, "r") as f:
@@ -111,17 +124,6 @@ def create_manifest(binary_path, entry_point, dependencies):
     print("✅ Файл manifest.hcl создан!")
 
 
-# --- Функция упаковки проекта в ZIP ---
-def create_zip_package(source_dir, output_zip):
-    with zipfile.ZipFile(output_zip, "w", zipfile.ZIP_DEFLATED) as zipf:
-        for root, _, files in os.walk(source_dir):
-            for file in files:
-                file_path = os.path.join(root, file)
-                zipf.write(file_path, os.path.relpath(file_path, source_dir))
-
-    print(f"✅ Архив создан: {output_zip}")
-
-
 # --- Функция запуска собранного приложения ---
 def run_binary(binary_path):
     print(f"🚀 Запуск: {binary_path}")
@@ -130,20 +132,12 @@ def run_binary(binary_path):
 
 # --- Основная логика работы менеджера ---
 def main(zip_path):
-    extracted_path = "./extracted"
-
-    # Если передан ZIP, распаковываем его
-    if os.path.exists(zip_path):
-        shutil.rmtree(extracted_path, ignore_errors=True)
-        os.makedirs(extracted_path)
-        with zipfile.ZipFile(zip_path, "r") as zip_ref:
-            zip_ref.extractall(extracted_path)
-        print(f"✅ Архив {zip_path} распакован в {extracted_path}")
-
+    extracted_path = extract_package(zip_path)
     manifest_path = os.path.join(extracted_path, "manifest.hcl")
 
     if not os.path.exists(manifest_path):
         raise FileNotFoundError("❌ Файл manifest.hcl не найден!")
+
 
     manifest = load_manifest(manifest_path)
     print(f"📜 Манифест загружен: {manifest}")
@@ -165,13 +159,8 @@ def main(zip_path):
     # Обновляем манифест с актуальной SHA256
     create_manifest(binary_path, manifest["entry_point"], manifest["dependencies"])
 
-    # Упаковываем в ZIP
-    output_zip = "package.zip"
-    create_zip_package(extracted_path, output_zip)
-
     # Запускаем собранное приложение
     run_binary(binary_path)
-
 
 # --- Точка входа ---
 if __name__ == "__main__":
