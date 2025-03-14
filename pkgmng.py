@@ -150,6 +150,7 @@ def main(zip_path):
 
     manifest_path = os.path.join(extracted_path, "test-package/manifest.hcl")
 
+
     if not os.path.exists(manifest_path):
         raise FileNotFoundError("❌ Файл manifest.hcl не найден!")
 
