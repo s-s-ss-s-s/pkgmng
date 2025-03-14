@@ -140,7 +140,7 @@ def main(zip_path):
             zip_ref.extractall(extracted_path)
         print(f"✅ Архив {zip_path} распакован в {extracted_path}")
 
-    manifest_path = os.path.join(extracted_path, "manifest.hcl")
+    manifest_path = os.path.join(extracted_path, "test-package/manifest.hcl")
 
     if not os.path.exists(manifest_path):
         raise FileNotFoundError("❌ Файл manifest.hcl не найден!")
@@ -175,5 +175,5 @@ def main(zip_path):
 
 # --- Точка входа ---
 if __name__ == "__main__":
-    zip_file = "test-package.zip"  # Укажи свой ZIP-архив
+    zip_file = "test-package.zip"
     main(zip_file)
